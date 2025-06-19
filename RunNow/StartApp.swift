@@ -1,42 +1,51 @@
-//
-//  StartApp.swift
-//  RunForBetter
-//
-//  Created by Foundation-010 on 16/06/25.
-//
-
 import SwiftUI
 
 struct StartView: View {
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-              
+            ZStack {
                 
-                Image(systemName: "figure.run.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .foregroundColor(.orange)
-                    .padding()
-                
-                
-                Text("Ready To Get Your IDeal Body?")
-                    .font(.largeTitle)
-                    .multilineTextAlignment(.center)
-
-                NavigationLink(destination: BMIInputView()) {
-                    Text("Start Now")
+            
+                VStack(spacing: 20) {
+                    Spacer()
+                    Text("Welcome To")
+                        .font(.largeTitle)
+                        .multilineTextAlignment(.center)
+                    
+                    Image(systemName: "figure.run.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.black)
                         .padding()
-                        .background(Color.orange)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .font(.system(size: 24))
-                  
-                        
+                    
+                    Text("Burn Cal App")
+                        .font(.largeTitle)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+       
+                NavigationLink(destination: NameEnter()) {
+                    Text("Start Now")
+                        .padding(.vertical, 14)
+                        .padding(.horizontal, 28)
+                        .background(.ultraThinMaterial)
+                        .foregroundColor(.primary)
+                        .font(.system(size: 18, weight: .bold))
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule().stroke(Color.black.opacity(0.2), lineWidth: 1)
+                        )
+                        .shadow(radius: 5)
+                
+                }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
-            .padding()
+            .ignoresSafeArea()
         }
     }
 }
@@ -44,4 +53,3 @@ struct StartView: View {
 #Preview {
     StartView()
 }
-
