@@ -7,48 +7,71 @@
 
 import SwiftUI
 
-struct NameEnter: View {
+struct NameEnter2: View {
     @State private var name: String = ""
-    @State private var goToNext = false
-
     var body: some View {
-        VStack {
-            Spacer()
-
-            VStack(spacing: 20) {
-                Text("Burn Cal App")
+        ZStack {
+            Color.white.ignoresSafeArea()
+            
+            
+            VStack (spacing: 0){
+                
+//                Spacer()
+            
+                
+                Text("Burn Call App")
                     .font(.largeTitle)
-                    .bold()
+                    .fontWeight(.bold)
+                    .padding(.bottom, 30)
+             
+              Divider()
+                    .frame(height: 1)
+                    .background(Color.black)
 
-                TextField("Enter your name", text: $name)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
-                    .frame(maxWidth: 300)
+            
+    
+                    VStack(spacing: 20) {
+                    
+                        
+                        Text("Enter Your Name")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .padding(.bottom, 60)
+                            
+                        
+                        TextField("Enter your name", text: $name)
+                            .textFieldStyle(.roundedBorder)
+                            .padding(.horizontal)
+                            .frame(maxWidth: 300)
+                            .padding()
 
-                NavigationLink(destination: BMIInputView(name: name), isActive: $goToNext) {
-                    EmptyView()
-                }
+                
 
-                Button("Save") {
-                    if !name.isEmpty {
-                        goToNext = true
+                        Button("Save") {
+                            if !name.isEmpty {
+                
+                            }
+                        }
+                        .bold()
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 40)
+                        .background(Color.combineBlue)
+                        .foregroundColor(.customButtonBlue)
+                        .cornerRadius(8)
                     }
-                }
-                .bold()
-                .padding(.vertical, 10)
-                .padding(.horizontal, 40)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                
+                
+                    .padding(.bottom,300)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.shadedWhite)
+                
+                
             }
-
-            Spacer()
         }
-        .padding()
     }
 }
 
 
 #Preview {
-    NameEnter()
+    NameEnter2()
 }

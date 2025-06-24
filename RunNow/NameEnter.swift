@@ -15,7 +15,7 @@ struct NameEnter: View {
         VStack {
             Spacer()
 
-            VStack(spacing: 40) {
+            VStack(spacing: 20) {
                 Text("Burn Cal App")
                     .font(.largeTitle)
                     .bold()
@@ -37,7 +37,7 @@ struct NameEnter: View {
                 .bold()
                 .padding(.vertical, 10)
                 .padding(.horizontal, 40)
-                .background(Color.black)
+                .background(Color.blue)
                 .foregroundColor(.white)
                 .cornerRadius(8)
             }

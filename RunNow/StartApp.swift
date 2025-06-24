@@ -16,7 +16,7 @@ struct StartView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.shadedOrange)
                         .padding()
                     
                     Text("Burn Cal App")
