@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct BMIResultPopup: View {
-    //Spasi
+    
     let name: String
     let bmi: Double
     let category: String
     var onClose: () -> Void
+    
+    @Binding var goToRunning: Bool
+    
     let weightDifference: Double
     let caloriesToBurn: Int
     
@@ -64,7 +67,7 @@ struct BMIResultPopup: View {
                 .cornerRadius(8)
                 
                 Button("Let's Start Running") {
-                    
+                    goToRunning = true
                 }
                 .padding()
                 .background(Color.green)
@@ -99,6 +102,8 @@ struct BMIResultPopup: View {
 
 
 #Preview {
-    BMIResultPopup(name: "Yizzrel", bmi: 23.1, category: "Normal Ideal weight", onClose: {}, weightDifference: 0.0, caloriesToBurn: 70)
+    BMIResultPopup(name: "Yizzrel", bmi: 23.1, category: "Normal Ideal weight",
+                 
+                   onClose: {},  goToRunning: .constant(false), weightDifference: 0.0, caloriesToBurn: 70)
 }
 

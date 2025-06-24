@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BMIInputView: View {
     let name: String
-//    @AppStorage("userName") private var name: String = ""
+
     @State private var height: String = ""
     @State private var weight: String = ""
     @State private var bmi: Double?
@@ -18,109 +18,143 @@ struct BMIInputView: View {
     @State private var weightDiff: Double = 0
     @State private var showBMICategories: Bool = false
     @State private var showInfoSheet: Bool = false
-    @Environment(\.presentationMode) var presentationMode
     @State private var calories: Int = 0
 
+    
+    @Environment(\.presentationMode) var presentationMode
+
+    @State private var goToRunning: Bool = false
+    @State private var weightAsDouble: Double = 0
+
     var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                Color.white.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                Text("BMI Calculator")
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.top)
+                VStack(spacing: 0) {
+                    Text("BMI Calculator")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.top)
 
-                Divider()
-                    .frame(height: 1)
-                    .background(Color.gray.opacity(0.3))
+                    Divider()
+                        .frame(height: 1)
+                        .background(Color.gray.opacity(0.3))
 
-                ZStack {
-                    Color.gray.opacity(0.05).ignoresSafeArea()
+                    ZStack {
+                        Color.gray.opacity(0.05).ignoresSafeArea()
 
-                    VStack(spacing: 20) {
-                        Spacer().frame(height: 20)
+                        VStack(spacing: 20) {
+                            Spacer().frame(height: 20)
 
-                        Text("Hai \(name), welcome to the app")
-                            .font(.title2)
-                            .bold()
-                            .padding(.top, 20)
+                            Text("Hai \(name), welcome to the app")
+                                .font(.title2)
+                                .bold()
+                                .padding(.top, 20)
 
-                        TextField("Enter weight (kg)", text: $weight)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(.roundedBorder)
-                            .padding()
-                            .frame(maxWidth: 300)
-                            .font(.system(size: 30))
-                            .background(.ultraThinMaterial)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
-                        TextField("Enter height (cm)", text: $height)
-                            .keyboardType(.decimalPad)
-                            .textFieldStyle(.roundedBorder)
-                            .padding()
-                            .frame(maxWidth: 300)
-                            .font(.system(size: 30))
-                            .background(.ultraThinMaterial)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-
-                        Button(action: {
-                            calculateBMI()
-                        }) {
-                            Text("Calculate BMI")
-                                .font(.headline)
-                                .foregroundColor(.gray)
+                            TextField("Enter weight (kg)", text: $weight)
+                                .keyboardType(.decimalPad)
+                                .textFieldStyle(.roundedBorder)
                                 .padding()
-                                .frame(width: 180)
+                                .frame(maxWidth: 300)
+                                .font(.system(size: 30))
                                 .background(.ultraThinMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                )
-                                .shadow(radius: 5)
-                        }
+//                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+//                                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
 
-                        DisclosureGroup(isExpanded: $showBMICategories) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack {
-                                    Text("Category").bold()
-                                    Spacer()
-                                    Text("BMI Range").bold()
-                                }
-                                .padding(.bottom, 2)
-
-                                Divider()
-
-                                row("Underweight", "< 18.5", highlight: category == "Underweight")
-                                row("Normal (Ideal)", "18.5 – 24.9", highlight: category == "Normal Ideal weight")
-                                row("Overweight", "25 – 29.9", highlight: category == "Overweight")
-                                row("Obesity Class I", "30 – 34.9", highlight: category == "Obese" && (bmi ?? 0) < 35)
-                                row("Obesity Class II", "35 – 39.9", highlight: category == "Obese" && (bmi ?? 0) < 40 && (bmi ?? 0) >= 35)
-                                row("Obesity Class III", "≥ 40", highlight: category == "Obese" && (bmi ?? 0) >= 40)
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(12)
-                        } label: {
-                            Text("Show BMI Categories (WHO)")
-                                .font(.headline)
+                            TextField("Enter height (cm)", text: $height)
+                                .keyboardType(.decimalPad)
+                                .textFieldStyle(.roundedBorder)
                                 .padding()
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: 300)
+                                .font(.system(size: 30))
+                                .background(.ultraThinMaterial)
+//                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                               // .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+
+                            Button(action: {
+                                calculateBMI()
+                            }) {
+                                Text("Calculate BMI")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                    .padding()
+                                    .frame(width: 180)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    )
+                                    .shadow(radius: 5)
+                            }
+
+                            DisclosureGroup(isExpanded: $showBMICategories) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text("Category").bold()
+                                        Spacer()
+                                        Text("BMI Range").bold()
+                                    }
+                                    .padding(.bottom, 2)
+
+                                    Divider()
+
+                                    row("Underweight", "< 18.5", highlight: category == "Underweight")
+                                    row("Normal (Ideal)", "18.5 – 24.9", highlight: category == "Normal Ideal weight")
+                                    row("Overweight", "25 – 29.9", highlight: category == "Overweight")
+                                    row("Obesity Class I", "30 – 34.9", highlight: category == "Obese" && (bmi ?? 0) < 35)
+                                    row("Obesity Class II", "35 – 39.9", highlight: category == "Obese" && (bmi ?? 0) < 40 && (bmi ?? 0) >= 35)
+                                    row("Obesity Class III", "≥ 40", highlight: category == "Obese" && (bmi ?? 0) >= 40)
+                                }
+                                .padding()
                                 .background(.ultraThinMaterial)
                                 .cornerRadius(12)
-                        }
-                        .accentColor(.black)
-                        .padding(.horizontal)
+                            } label: {
+                                Text("Show BMI Categories (WHO)")
+                                    .font(.headline)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(12)
+                            }
+                            .accentColor(.black)
+                            .padding(.horizontal)
 
-                        Spacer()
+                            Spacer()
+                        }
+                    }
+                }
+                .navigationTitle("BMI Input")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(true)
+
+
+                if showPopup, let result = bmi {
+                    Color.black.opacity(0.4).ignoresSafeArea()
+
+                    BMIResultPopup(
+                        name: name,
+                        bmi: result,
+                        category: category,
+                        onClose: { withAnimation { showPopup = false } },
+                        goToRunning: $goToRunning,
+                        weightDifference: weightDiff,
+                        caloriesToBurn: calories
+                    
+                    )
+                    .transition(.scale)
+                    .overlay(
+                        NavigationLink("", destination: RunningBurnTrackerView(userWeightKg: weightAsDouble), isActive: $goToRunning)
+                            .opacity(0)
+                    )
+                    .onAppear {
+    
+                    }
+                    .onChange(of: goToRunning) { _ in
+                        showPopup = false
                     }
                 }
             }
-            .navigationTitle("BMI Input")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
@@ -146,20 +180,8 @@ struct BMIInputView: View {
             .sheet(isPresented: $showInfoSheet) {
                 BMISheetInfoView()
             }
-
-            if showPopup, let result = bmi {
-                Color.black.opacity(0.4).ignoresSafeArea()
-
-                BMIResultPopup(
-                    name: name,
-                    bmi: result,
-                    category: category,
-                    onClose: { withAnimation { showPopup = false } },
-                    weightDifference: weightDiff,
-                    caloriesToBurn: calories
-                )
-                .transition(.scale)
-            }
+            
+            
         }
     }
 
@@ -210,10 +232,12 @@ struct BMIInputView: View {
 
         weightDiff = idealSubtraction(weight: w, heightCm: h)
         calories = weightDiff > 0 ? caloriesConvertWeight(from: weightDiff) : 0
+        weightAsDouble = w
         showPopup = true
         showBMICategories = true
     }
 }
+
 
 #Preview {
     BMIInputView(name: "yizzrell")
