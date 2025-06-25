@@ -4,30 +4,23 @@ struct StartView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                // Background warna hitam full
+                Color.background
+                    .ignoresSafeArea()
                 
-            
                 VStack(spacing: 20) {
                     Spacer()
-                    Text("Welcome To")
-                        .font(.largeTitle)
-                        .multilineTextAlignment(.center)
-                    
-                    Image(systemName: "figure.run.circle.fill")
+
+                    // Logo dengan latar belakang transparan
+                    Image("bcal_transparan")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        .foregroundColor(Color.shadedOrange)
-                        .padding()
-                    
-                    Text("Burn Cal App")
-                        .font(.largeTitle)
-                        .multilineTextAlignment(.center)
-                    
+                        .padding(.horizontal, 24)
+
                     Spacer()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                
-       
+
+                // Tombol Navigasi
                 NavigationLink(destination: NameEnter()) {
                     Text("Start Now")
                         .padding(.vertical, 14)
@@ -37,15 +30,13 @@ struct StartView: View {
                         .font(.system(size: 18, weight: .bold))
                         .clipShape(Capsule())
                         .overlay(
-                            Capsule().stroke(Color.black.opacity(0.2), lineWidth: 1)
+                            Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1)
                         )
                         .shadow(radius: 5)
-                
                 }
                 .padding()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
-            .ignoresSafeArea()
         }
     }
 }
