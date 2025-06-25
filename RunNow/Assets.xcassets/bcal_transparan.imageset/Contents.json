@@ -1,17 +1,50 @@
 {
   "images" : [
     {
-      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2 2.png",
+      "filename" : "New LOgo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Logo Baru Putih.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "New LOgo 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2 1.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Logo Baru Putih 2.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "New LOgo 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Logo Baru Putih 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

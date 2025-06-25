@@ -4,9 +4,13 @@ struct StartView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background warna hitam full
-                Color.background
-                    .ignoresSafeArea()
+                
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.belakang, Color.eak]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
                 
                 VStack(spacing: 20) {
                     Spacer()
