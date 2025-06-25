@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2 2.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Oranye dan Putih Logo Restoran Ayam Bakar-2 1.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
