@@ -23,7 +23,6 @@ struct RunningBurnTrackerView: View {
         VStack(spacing: 20) {
             
             Spacer()
-            
             Text("Running Burn Tracker")
             .font(.largeTitle)
             .bold()

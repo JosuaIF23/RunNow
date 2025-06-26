@@ -26,7 +26,7 @@ struct BMIInputView: View {
     @State private var goToRunning: Bool = false
     @State private var weightAsDouble: Double = 0
 
-    var body: some View {
+    var body: some View {   
         NavigationStack {
             ZStack {
                 Color.white.ignoresSafeArea()
@@ -162,7 +162,7 @@ struct BMIInputView: View {
                     }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
-                            .padding(12)
+                            .padding()
                             .background(.ultraThinMaterial)
                             .clipShape(Circle())
                     }
