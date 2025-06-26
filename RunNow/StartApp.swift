@@ -29,7 +29,7 @@ struct StartView: View {
                     Text("Start Now")
                         .padding(.vertical, 14)
                         .padding(.horizontal, 28)
-                        .background(.ultraThinMaterial)
+                        .background(.biluu)
                         .foregroundColor(.primary)
                         .font(.system(size: 18, weight: .bold))
                         .clipShape(Capsule())
