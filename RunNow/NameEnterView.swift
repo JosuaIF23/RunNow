@@ -30,11 +30,10 @@ struct NameEnterView: View {
                 
                 Spacer()
                 
-                Image(.logoOk)
+                Image(.bcalTransparan)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 350, height: 300)
-                    .clipShape(Circle())
                     .shadow(color: .shadedOrange, radius: 10)
                     .colorMultiply(.shadedOrange)
                     .padding()
