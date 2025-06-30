@@ -7,104 +7,91 @@
 
 import SwiftUI
 
-
 struct BMIResultPopup: View {
-    
     let name: String
     let bmi: Double
     let category: String
-    var onClose: () -> Void
-    
+    let onClose: () -> Void
     @Binding var goToRunning: Bool
-    
     let weightDifference: Double
     let caloriesToBurn: Int
-    
     var body: some View {
-        VStack (spacing: 16) {
+        VStack(spacing: 16) {
             
-            Text("\(name)✌️")
-                .font(.title)
-            
-            
-            Text("Your BMI")
-                .font(.headline)
-            
-            Text(String(format: "%.2f", bmi))
-                .font(.largeTitle)
-                .bold()
-            
-            Text("Your Body Category is:")
-                .font(.headline)
-            
-            Text(category)
-                .font(.headline)
-                .foregroundColor(.black)
-            
-    
-            Text(weightDifferenceText())
-                .font(.headline)
-                .foregroundColor(.black)
+            Text("Hi, \(name)!")
+                .font(.body)
+                .fontWeight(.bold)
+            Text("Your BMI is \(String(format: "%.2f", bmi)). Your body category is \(category). \(weightDifferenceText())")
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
             
             if caloriesToBurn > 0 {
-                Text("To reach Your Ideal Weight, you need to burn approximately:")
+                Text("To reach your ideal weight, you need to burn approximately \(caloriesToBurn) calories.")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
+                    .font(.largeTitle)
                 
-                Text("\(caloriesToBurn) calories")
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.red)
-            }
-            
-            HStack {
-                Button("Back") {
-                    onClose()
+                Divider()
+                    .padding(.vertical, 8)
+                
+                HStack(spacing: 16) {
+                    Button("Back") {
+                        onClose()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .tint(.shadedWhite)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(.white)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.shadedWhite)
+                    )
+                    
+                    Button("Let's Start Running") {
+                        goToRunning = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.shadedOrange)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(.white)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.shadedOrange)
+                    )
                 }
-            
-                .padding()
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-                
-                Button("Let's Start Running") {
-                    goToRunning = true
-                }
-                .padding()
-                .background(Color.green)
-                .foregroundColor(Color.white)
-                .cornerRadius(8)
-                
- 
-                
-                
             }
+                .foregroundStyle(.darkHue)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 24)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 1)
+                )
+                .padding(.horizontal, 16)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .frame(maxWidth: 300)
-    }
-    
-    func weightDifferenceText() -> String {
-        switch category {
-        case "Underweight":
-            return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
-        case "Normal Ideal weight":
-            return "You're at your ideal weight."
-        case "Overweight", "Obese":
-            return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
-        default:
-            return ""
+        
+        func weightDifferenceText() -> String {
+            switch category {
+            case "Underweight":
+                return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
+            case "Normal Ideal weight":
+                return "You're at your ideal weight."
+            case "Overweight", "Obese":
+                return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
+            default:
+                return ""
+            }
         }
     }
 }
 
-
 #Preview {
-    BMIResultPopup(name: "Yizzrel", bmi: 23.1, category: "Normal Ideal weight",
-                 
-                   onClose: {},  goToRunning: .constant(false), weightDifference: 0.0, caloriesToBurn: 70)
+BMIResultPopup(name: "User", bmi: 23.1, category: "Normal Ideal weight",
+               onClose: {}, goToRunning: .constant(false), weightDifference: 0.0, caloriesToBurn: 70)
 }
 
