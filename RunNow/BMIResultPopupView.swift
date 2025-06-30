@@ -1,11 +1,5 @@
-//
-//  BMIResultPopup.swift
-//  RunForBetter
-//
-//  Created by Foundation-010 on 17/06/25.
-//
-
 import SwiftUI
+import SwiftData
 
 struct BMIResultPopup: View {
     let name: String
@@ -15,9 +9,10 @@ struct BMIResultPopup: View {
     @Binding var goToRunning: Bool
     let weightDifference: Double
     let caloriesToBurn: Int
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
         VStack(spacing: 16) {
-            
             Text("Hi, \(name)!")
                 .font(.body)
                 .fontWeight(.bold)
@@ -49,6 +44,21 @@ struct BMIResultPopup: View {
                             .fill(.shadedWhite)
                     )
                     
+                    Button("OK") {
+                        saveData()
+                        onClose()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .tint(.shadedWhite)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(.white)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.shadedWhite)
+                    )
+                    
                     Button("Let's Start Running") {
                         goToRunning = true
                     }
@@ -63,35 +73,42 @@ struct BMIResultPopup: View {
                             .fill(.shadedOrange)
                     )
                 }
-            }
                 .foregroundStyle(.darkHue)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 24)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 1)
-                )
-                .padding(.horizontal, 16)
-        }
-        
-        func weightDifferenceText() -> String {
-            switch category {
-            case "Underweight":
-                return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
-            case "Normal Ideal weight":
-                return "You're at your ideal weight."
-            case "Overweight", "Obese":
-                return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
-            default:
-                return ""
             }
         }
+        .padding(.vertical, 24)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 1)
+        )
+        .padding(.horizontal, 16)
+    }
+    
+    func weightDifferenceText() -> String {
+        switch category {
+        case "Underweight":
+            return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
+        case "Normal Ideal weight":
+            return "You're at your ideal weight."
+        case "Overweight", "Obese":
+            return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
+        default:
+            return ""
+        }
+    }
+    
+    private func saveData() {
+        let dailyData = DailyDataModel(
+            date: Date(),
+            bmi: bmi,
+            category: category,
+            weightDifference: weightDifference,
+            caloriesToBurn: caloriesToBurn,
+            name: name
+        )
+        modelContext.insert(dailyData)
+        try? modelContext.save()
     }
 }
-
-#Preview {
-BMIResultPopup(name: "User", bmi: 23.1, category: "Normal Ideal weight",
-               onClose: {}, goToRunning: .constant(false), weightDifference: 0.0, caloriesToBurn: 70)
-}
-

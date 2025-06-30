@@ -1,5 +1,5 @@
 //
-//  RunningBurnTracker.swift
+//  RunningBurnTrackerView.swift
 //  RunNow
 //
 //  Created by Foundation-010 on 19/06/25.
@@ -8,136 +8,116 @@
 import SwiftUI
 
 struct RunningBurnTrackerView: View {
-    var motion = MotionTracker()
-    var timer = StopWatchTimer()
+    @StateObject var motion = MotionTracker()
+    @StateObject var timer = StopWatchTimer()
 
-    var isRunnig = false
-    var userWeightKg : Double
+    @State private var isRunning = false
+    let userWeightKg: Double
     
-    
-    //this is adding
-    var finalCaloriesBurned: Double?
-    var runFinished = false
-    
-    
+    @State private var finalCaloriesBurned: Double?
+    @State private var runFinished = false
     
     var body: some View {
-        VStack(spacing: 20) {
-            
-            
-            Text("\(timer.formated)")
-                .font(.title)
-                .bold()
-                .padding(.vertical, 120 )
-            
-            if !isRunnig {
-                
-                Button("Start") {
-                    isRunnig = true
+        VStack(spacing: 50) {
+            Text("Burn Calorie App")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.blue) // Ganti dengan .shadedBlue jika didefinisikan
+                .padding(.top, 30)
+
+            VStack(spacing: 10) {
+                HStack(spacing: 5) {
+                    Image(systemName: "clock.fill")
+                    Text("Time")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.cyan) // Ganti dengan .lightBlue jika didefinisikan
+                }
+
+                Text(timer.formated)
+                    .font(.title3)
+                    .fontWeight(.medium)
+                    .padding(.bottom)
+
+                HStack {
+                    VStack {
+                        Text("Distance")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.cyan) // Ganti dengan .lightBlue jika didefinisikan
+                        Text("\(motion.distance / 1000, specifier: "%.2f") km")
+                            .fontWeight(.medium)
+                    }
+
+                    Spacer()
+
+                    VStack {
+                        Text("Calories")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.cyan) // Ganti dengan .lightBlue jika didefinisikan
+                        if let calories = finalCaloriesBurned {
+                            Text("\(calories, specifier: "%.0f") cal")
+                                .fontWeight(.medium)
+                        } else {
+                            Text("\(motion.estimateCaloriesBurned(weightKG: userWeightKg, minutes: timer.minutes), specifier: "%.0f") cal")
+                                .fontWeight(.medium)
+                                .foregroundColor(.gray)
+                        }
+                    }
+
+                    Spacer()
+
+                    VStack {
+                        Text("Pace")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.cyan) // Ganti dengan .lightBlue jika didefinisikan
+                        Text("\(motion.pace, specifier: "%.2f") m/s")
+                            .fontWeight(.medium)
+                    }
+                }
+                .padding()
+                .frame(width: 350, height: 90)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                .padding(.horizontal)
+            }
+
+            Spacer()
+
+            Button(action: {
+                if !isRunning {
+                    isRunning = true
                     runFinished = false
                     finalCaloriesBurned = nil
                     motion.startTracking()
-                    timer.StartWatch()
-        
-                    
-                }
-                .foregroundColor(.kuning)
-                .padding()
-                .frame(width: 80)
-                .background(Color(UIColor.systemGray6))
-                .foregroundColor(Color.white)
-                .cornerRadius(360)
-                
-            } else {
-                Button("Stop") {
-                    isRunnig = false
+                    timer.startWatch()
+                } else {
+                    isRunning = false
                     motion.stopTracking()
-                    timer.StopWatch()
+                    timer.stopWatch()
                     runFinished = true
                     finalCaloriesBurned = motion.estimateCaloriesBurned(weightKG: userWeightKg, minutes: timer.minutes)
                 }
-                .padding()
-                .frame(width: 100)
-                .background(Color.red)
-                .foregroundColor(Color.white)
-                .cornerRadius(12)
-                .cornerRadius(360)
+            }) {
+                Text(isRunning ? "Stop" : "Start")
+                    .frame(width: 100, height: 60)
+                    .foregroundColor(.white)
+                    .background(isRunning ? .red : .green)
+                    .clipShape(Circle())
+                    .padding(.bottom, 50)
             }
-            
-            HStack(spacing: 40){
-                
-                VStack {
-                    Text("Distance") .foregroundColor(.cyn)
-                    Text("\(motion.distance / 1000, specifier: "%.2f") km")
-    
-                }
-                
-                
-                VStack{
-                    Text("Steps") .foregroundColor(.ning)
-                    Text("\(motion.steps)")
-                        
-                }
-                
-                VStack{
-                    Text("Pace") .foregroundColor(.rah)
-                    Text("\(motion.pace, specifier: "%.2f") m/s")
-                }
-                
-                VStack{
-                    Text("MET") .foregroundColor(.ru)
-                    Text(" \(motion.estimateMET(), specifier: "%.1f")")
-                    
-                }
-                
-            }
-            .frame(maxWidth: .infinity, minHeight: 80)
-            .background(
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color(UIColor.systemGray6))
-            )
-            //            Text("Calories Burned: \(motion.estimateCaloriesBurned(weightKG: userWeightKg, minutes: timer.minutes), specifier: "%.0f") cal")
-            
-            
-            
-            if let calories = finalCaloriesBurned {
-                Text("Calories Burned: \(calories, specifier: "%.0f") cal")
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.red)
-            }
-            
-            Image("maps")
-                .resizable()
-                .frame(width: 300, height: 200)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(UIColor.systemGray6))
-                )
-                .shadow(radius: 2)
-                
-
-            
-   
-            
+            .font(.headline)
+            .fontWeight(.semibold)
         }
-        Spacer()
-        
-   
+        .padding()
     }
 }
 
-
 #Preview {
-   RunningBurnTrackerView(userWeightKg: 60)
+    RunningBurnTrackerView(userWeightKg: 60)
 }
-//@StateObject var motion = MotionTracker()
-//@StateObject var timer = StopWatchTimer()
-
-//@State private var isRunnig = false
-//@State  var userWeightKg : Double
 
 
-//this is adding
-//@State private var finalCaloriesBurned: Double?
-//@State private var runFinished = false

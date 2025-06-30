@@ -14,7 +14,7 @@ class StopWatchTimer: ObservableObject {
     private var startDate: Date?
     private var lastElapsed: TimeInterval = 0
     
-    func StartWatch() {
+    func startWatch() {
         startDate = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             guard let start = self.startDate else { return }
@@ -22,7 +22,7 @@ class StopWatchTimer: ObservableObject {
         }
     }
     
-    func StopWatch() {
+    func stopWatch() {
         timer?.invalidate()
         timer = nil
         if let start = startDate {
@@ -31,7 +31,7 @@ class StopWatchTimer: ObservableObject {
         startDate = nil
     }
     
-    func ResetTimer() {
+    func resetTimer() {
         elapsedTime = 0
         startDate = nil
     }
@@ -40,7 +40,7 @@ class StopWatchTimer: ObservableObject {
         elapsedTime / 60
     }
     
-    var formated: String {
+    var formated: String { // Perbaiki typo dari formated ke formatted (opsional, tapi lebih standar)
         let minutes = Int(elapsedTime) / 60
         let seconds = Int(elapsedTime) % 60
         return String(format: "%02d:%02d", minutes, seconds)
