@@ -1,3 +1,10 @@
+//
+//  RunningBurnTrackerView.swift
+//  RunNow
+//
+//  Created by Foundation-010 on 19/06/25.
+//
+
 import SwiftUI
 
 struct RunningBurnTrackerView: View {
