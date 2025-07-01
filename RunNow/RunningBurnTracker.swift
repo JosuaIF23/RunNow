@@ -26,6 +26,7 @@ struct RunningBurnTrackerView: View {
             if !isRunning {
                 Button("Start") {
                     isRunning = true
+                 
                     runFinished = false
                     finalCaloriesBurned = nil
                     motion.startTracking()

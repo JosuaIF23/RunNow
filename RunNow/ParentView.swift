@@ -7,78 +7,83 @@ struct ParentView: View {
     let name: String
 
     var body: some View {
-        NavigationView {
-            VStack {
+        NavigationStack {
+            VStack(spacing: 10) {
                 Text("Burn Calorie App")
                     .font(.largeTitle)
                     .bold()
-                    .foregroundColor(.black) // Mengganti putih dengan hitam untuk kontras netral
-                    .padding(.top)
+                    .foregroundColor(.black)
+                    .padding(.top, 20) // Tambahkan padding lebih besar untuk jarak dari atas
                 
-                Divider()
-                    .frame(height: 1)
-                    .background(Color.gray.opacity(0.3)) // Abu-abu netral untuk divider
-                
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 30) {
                     Text("Hai, \(name)!")
-                        .font(.title2)
+                        .font(.title)
                         .bold()
-                        .foregroundColor(.black) // Hitam untuk teks utama
-                        .padding(.top, 10)
+                        .foregroundColor(.black)
                     
-                    List {
-                        ForEach(dailyData) { data in
-                            VStack {
-                                // Item pertama: Tanggal dengan warna netral
-                                Text(dateToString(data.date))
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray) // Abu-abu untuk teks sekunder
-                                
-                                // Item kedua: Status teks sebagai NavigationLink
+                    if dailyData.isEmpty {
+                        Text("Tidak ada data tersedia")
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .padding()
+                    } else {
+                        VStack(spacing: 20) {
+                            ForEach(dailyData, id: \.id) { data in
                                 NavigationLink(destination: DetailView(dailyData: data)) {
-                                    Text(getStatusText(data: data))
-                                        .font(.headline)
-                                        .foregroundColor(.black) // Hitam untuk teks utama
-                                }
-                                
-                                Spacer()
-                                
-                                // Tombol "Run" dengan warna netral
-                                if data.bmi != nil {
-                                    NavigationLink(destination: RunningBurnTrackerView(userWeightKg: data.weightDifference ?? 60.0)) {
-                                        Text("Run")
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 5)
-                                            .background(Color.gray.opacity(0.2)) // Latar belakang abu-abu lembut
-                                            .foregroundColor(.black) // Teks hitam
-                                            .cornerRadius(8)
+                                    VStack(alignment: .leading, spacing: 9) {
+                                        Text(dateToString(data.date))
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.black)
+                                        
+                                        Text(statusText(for: data))
+                                            .font(.body)
+                                            .foregroundColor(.black)
                                     }
+                                    .padding()
+                                    .frame(width: 350)
+                                    .background(Color.gray.opacity(0.1))
+                                    .cornerRadius(8)
                                 }
                             }
-                            .padding(.vertical, 5)
-                            .background(Color.white.opacity(0.8)) // Latar belakang putih lembut
-                            .cornerRadius(8)
-                            .padding(.horizontal, 5)
                         }
                     }
-                    .listStyle(PlainListStyle())
-                    .background(Color.gray.opacity(0.05)) // Latar belakang list abu-abu sangat lembut
+                    
+                    Spacer()
+                    
+                    if !dailyData.isEmpty {
+                        NavigationLink(destination: RunningBurnTrackerView(userWeightKg: dailyData.first?.weightDifference ?? 60.0)) {
+                            Text("Lanjut Progres!")
+                                .font(.headline)
+                                .bold()
+                                .padding()
+                                .frame(width: 350)
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(30)
+                        }
+                    }
                 }
-                
-                Spacer()
+                .padding(.horizontal)
             }
-            .background(Color.white) // Latar belakang penuh putih netral
-            .ignoresSafeArea()
-            .navigationBarHidden(true)
-        }
-        .onAppear {
-            print("Loaded data count: \(dailyData.count)")
+            .background(Color.white)
+            // Menghapus .ignoresSafeArea() untuk menghormati safe area
+            .padding(.top) // Padding tambahan untuk memastikan konten tidak terlalu dekat dengan tepi atas
+            .onAppear {
+                print("Loaded data count: \(dailyData.count)")
+            }
         }
     }
 
-    @Environment(\.presentationMode) var presentationMode
+    private func statusText(for data: DailyDataModel) -> String {
+        let baseText = getStatusText(data: data)
+        if let weightDifference = data.weightDifference {
+            return "\(baseText). Your ideal is \(Int(weightDifference)) kg"
+        }
+        return baseText
+    }
 
-    func getStatusText(data: DailyDataModel) -> String {
+    private func getStatusText(data: DailyDataModel) -> String {
         guard let category = data.category else { return "No data" }
         switch category {
         case "Normal Ideal weight":
@@ -94,7 +99,7 @@ struct ParentView: View {
         }
     }
 
-    func dateToString(_ date: Date) -> String {
+    private func dateToString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "id_ID")
         formatter.dateFormat = "EEEE, dd MMMM yyyy"

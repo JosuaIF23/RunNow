@@ -23,10 +23,7 @@ struct NameEnterView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 10) {
-                Text("Burn Calorie App")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .padding(.all)
+
                 
                 Spacer()
                 
