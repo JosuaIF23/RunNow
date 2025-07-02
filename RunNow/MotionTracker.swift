@@ -9,7 +9,6 @@ import Foundation
 import CoreMotion
 import Combine
 
-//sdfafafa Dantul Kontol
 //why use this ObservaleObject??? karna setiap data yang berubah maka akan langsung di update oleh UI
 class MotionTracker: ObservableObject {
     private let pedometer = CMPedometer()
