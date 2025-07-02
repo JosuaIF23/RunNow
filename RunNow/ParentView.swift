@@ -20,7 +20,7 @@ struct ParentView: View {
                     .font(.largeTitle)
                     .bold()
                     .foregroundColor(.black)
-                    .padding(.top, 20) // Tambahkan padding lebih besar untuk jarak dari atas
+                    .padding(.top, 20)
                 
                 VStack(alignment: .leading, spacing: 30) {
                     Text("Hai, \(name)!")
@@ -36,22 +36,40 @@ struct ParentView: View {
                     } else {
                         VStack(spacing: 20) {
                             ForEach(dailyData, id: \.id) { data in
-                                NavigationLink(destination: DetailView(dailyData: data)) {
-                                    VStack(alignment: .leading, spacing: 9) {
-                                        Text(dateToString(data.date))
-                                            .font(.title2)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.black)
-                                        
-                                        Text(statusText(for: data))
-                                            .font(.body)
-                                            .foregroundColor(.black)
+                                VStack(alignment: .leading, spacing: 9) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 9) {
+                                            Text(dateToString(data.date))
+                                                .font(.title2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.black)
+                                            
+                                            Text(statusText(for: data))
+                                                .font(.body)
+                                                .foregroundColor(.black)
+                                        }
+                                        Spacer()
+                                        NavigationLink(destination: RunningBurnTrackerView(dailyData: data)) {
+                                            Text("Run")
+                                                .font(.headline)
+                                                .bold()
+                                                .padding(.vertical, 8)
+                                                .padding(.horizontal, 16)
+                                                .background(Color.blue)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(8)
+                                        }
                                     }
-                                    .padding()
-                                    .frame(width: 350)
-                                    .background(Color.gray.opacity(0.1))
-                                    .cornerRadius(8)
+                                    NavigationLink(destination: DetailView(dailyData: data)) {
+                                        EmptyView()
+                                    }
+                                    .frame(width: 0, height: 0)
+                                    .opacity(0)
                                 }
+                                .padding()
+                                .frame(width: 350)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(8)
                             }
                         }
                     }
@@ -59,7 +77,7 @@ struct ParentView: View {
                     Spacer()
                     
                     if !dailyData.isEmpty {
-                        NavigationLink(destination: RunningBurnTrackerView(userWeightKg: dailyData.first?.weightDifference ?? 60.0)) {
+                        NavigationLink(destination: RunningBurnTrackerView(dailyData: dailyData.first)) {
                             Text("Lanjut Progres!")
                                 .font(.headline)
                                 .bold()
@@ -74,8 +92,7 @@ struct ParentView: View {
                 .padding(.horizontal)
             }
             .background(Color.white)
-            // Menghapus .ignoresSafeArea() untuk menghormati safe area
-            .padding(.top) // Padding tambahan untuk memastikan konten tidak terlalu dekat dengan tepi atas
+            .padding(.top)
             .onAppear {
                 print("Loaded data count: \(dailyData.count)")
             }

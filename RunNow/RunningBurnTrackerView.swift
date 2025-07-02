@@ -6,13 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct RunningBurnTrackerView: View {
+    @Environment(\.modelContext) private var modelContext
     @StateObject var motion = MotionTracker()
     @StateObject var timer = StopWatchTimer()
-    
     @State private var isRunning = false
-    let userWeightKg: Double
+    let dailyData: DailyDataModel?
     
     @State private var finalCaloriesBurned: Double?
     @State private var runFinished = false
@@ -33,7 +34,6 @@ struct RunningBurnTrackerView: View {
             if !isRunning {
                 Button("Start") {
                     isRunning = true
-                 
                     runFinished = false
                     finalCaloriesBurned = nil
                     motion.startTracking()
@@ -50,7 +50,8 @@ struct RunningBurnTrackerView: View {
                     motion.stopTracking()
                     timer.stopWatch()
                     runFinished = true
-                    finalCaloriesBurned = motion.estimateCaloriesBurned(weightKG: userWeightKg, minutes: timer.minutes)
+                    finalCaloriesBurned = motion.estimateCaloriesBurned(weightKG: currentWeight, minutes: timer.minutes)
+                    saveRunData()
                 }
                 .padding()
                 .frame(width: 100)
@@ -83,7 +84,7 @@ struct RunningBurnTrackerView: View {
                         Text("\(calories, specifier: "%.0f") cal")
                             .fontWeight(.medium)
                     } else {
-                        Text("\(motion.estimateCaloriesBurned(weightKG: userWeightKg, minutes: timer.minutes), specifier: "%.0f") cal")
+                        Text("\(motion.estimateCaloriesBurned(weightKG: currentWeight, minutes: timer.minutes), specifier: "%.0f") cal")
                             .fontWeight(.medium)
                             .foregroundColor(.gray)
                     }
@@ -139,8 +140,58 @@ struct RunningBurnTrackerView: View {
         }
         .padding()
     }
+    
+    private var currentWeight: Double {
+        guard let weightDiff = dailyData?.weightDifference else { return 60.0 } // Default to 60 kg if no data
+        let idealWeight = 22.0 * (1.7 * 1.7) // Example: Assume height 1.7m, BMI 22
+        return idealWeight + weightDiff
+    }
+    
+    private func saveRunData() {
+        guard let dailyData = dailyData, let caloriesBurned = finalCaloriesBurned else { return }
+        
+        // Update caloriesToBurn
+        if let currentCalories = dailyData.caloriesToBurn {
+            dailyData.caloriesToBurn = max(0, currentCalories - Int(caloriesBurned))
+        }
+        
+        // Calculate weight loss (7700 calories = 1 kg)
+        let weightLoss = caloriesBurned / 7700.0
+        let newWeight = currentWeight - weightLoss
+        
+        // Create new RunDataModel
+        let runData = RunDataModel(
+            distance: motion.distance,
+            duration: timer.minutes,
+            caloriesBurned: Int(caloriesBurned),
+            updatedWeight: newWeight,
+            runDate: Date(),
+            dailyData: dailyData
+        )
+        
+        // Update DailyDataModel
+        dailyData.runData = runData
+        
+        // Save to SwiftData
+        modelContext.insert(runData)
+        do {
+            try modelContext.save()
+            print("Run data saved successfully: \(runData)")
+        } catch {
+            print("Failed to save run data: \(error.localizedDescription)")
+        }
+    }
 }
 
 #Preview {
-    RunningBurnTrackerView(userWeightKg: 60)
+    RunningBurnTrackerView(dailyData: DailyDataModel(
+        id: UUID(),
+        date: Date(),
+        bmi: 27.0,
+        category: "Overweight",
+        weightDifference: 5.0,
+        caloriesToBurn: 38500,
+        name: "Placidia"
+    ))
+    .modelContainer(for: [DailyDataModel.self, RunDataModel.self])
 }
