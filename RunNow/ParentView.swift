@@ -1,25 +1,19 @@
-//
-//  ParentView.swift
-//  RunNow
-//
-//  Created by Foundation-005 on 19/06/25.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ParentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \DailyDataModel.date, order: .reverse) private var allData: [DailyDataModel]
+
+    @Query(sort: \DailyDataModel.date, order: .reverse)
+    private var allData: [DailyDataModel]
 
     let name: String
+    @State private var filteredData: [DailyDataModel] = []
     @State private var goToTracker = false
     @State private var latestProgress: DailyDataModel?
+    @State private var isCreating = false
 
     var body: some View {
-        let dailyData = allData.filter { $0.name == name }
-        let validData = dailyData.filter { $0.bmi != nil && $0.category != nil }
-
         NavigationStack {
             VStack(spacing: 10) {
                 Text("Burn Calorie App")
@@ -34,7 +28,7 @@ struct ParentView: View {
                         .bold()
                         .foregroundColor(.black)
 
-                    if validData.isEmpty {
+                    if filteredData.isEmpty {
                         Text("Tidak ada data tersedia")
                             .font(.body)
                             .foregroundColor(.gray)
@@ -42,7 +36,7 @@ struct ParentView: View {
                     } else {
                         ScrollView {
                             VStack(spacing: 20) {
-                                ForEach(validData, id: \.id) { data in
+                                ForEach(filteredData, id: \.id) { data in
                                     VStack(alignment: .leading, spacing: 9) {
                                         HStack {
                                             VStack(alignment: .leading, spacing: 9) {
@@ -80,42 +74,33 @@ struct ParentView: View {
 
                     Spacer()
 
-                    // Tombol Lanjut Progres (Selalu buat baru)
-                    Button(action: {
-                        let now = Date()
-
-                        if let template = dailyData
-                            .filter { $0.bmi != nil && $0.category != nil }
-                            .sorted(by: { $0.date < $1.date })
-                            .last {
-
-                            let newData = DailyDataModel(
-                                date: now,
-                                bmi: template.bmi,
-                                category: template.category,
-                                weightDifference: template.weightDifference,
-                                caloriesToBurn: template.caloriesToBurn,
-                                name: name
-                            )
-
-                            modelContext.insert(newData)
-                            try? modelContext.save()
-                            latestProgress = newData
+                    Button(action: createNewProgress) {
+                        HStack {
+                            if isCreating {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            }
+                            Text("Lanjut Progres!")
+                                .font(.headline)
+                                .bold()
                         }
-                    }) {
-                        Text("Lanjut Progres!")
-                            .font(.headline)
-                            .bold()
-                            .padding()
-                            .frame(width: 350)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(30)
+                        .padding()
+                        .frame(width: 350)
+                        .background(isCreating ? Color.gray : Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(30)
                     }
+                    .disabled(isCreating)
 
-                    // Navigasi ke Tracker
                     NavigationLink(
-                        destination: latestProgress.map { RunningBurnTrackerView(dailyData: $0) },
+                        destination: latestProgress.map {
+                            RunningBurnTrackerView(dailyData: $0)
+                                .onDisappear {
+                                    latestProgress = nil
+                                    goToTracker = false
+                                    isCreating = false
+                                }
+                        },
                         isActive: $goToTracker
                     ) {
                         EmptyView()
@@ -123,12 +108,73 @@ struct ParentView: View {
                     .opacity(0)
                 }
                 .padding(.horizontal)
-                .onChange(of: latestProgress) { _ in
-                    goToTracker = latestProgress != nil
-                }
             }
             .background(Color.white)
             .padding(.top)
+        }
+        .onAppear {
+            filterData()
+        }
+        .onChange(of: allData) { _ in
+            filterData()
+        }
+    }
+
+    // MARK: - Filtering & Creation
+
+    private func filterData() {
+        let filtered = allData.filter { $0.name == name && $0.bmi != nil && $0.category != nil }
+
+        // Hindari duplikat berdasarkan menit (buang milidetik)
+        let grouped = Dictionary(grouping: filtered) { data in
+            Calendar.current.date(bySetting: .second, value: 0, of: data.date) ?? data.date
+        }
+
+        filteredData = grouped.values.map { $0.first! }.sorted(by: { $0.date > $1.date })
+    }
+
+    private func createNewProgress() {
+        guard !isCreating else { return }
+        isCreating = true
+
+        let now = Date()
+
+        // Cegah spam dalam 10 detik terakhir
+        if let last = filteredData.first, now.timeIntervalSince(last.date) < 10 {
+            print("⛔️ Sudah ada data dalam 10 detik terakhir")
+            isCreating = false
+            return
+        }
+
+        guard let template = filteredData.last else {
+            print("⚠️ Tidak ada template valid untuk user \(name)")
+            isCreating = false
+            return
+        }
+
+        let newData = DailyDataModel(
+            date: now,
+            bmi: template.bmi,
+            category: template.category,
+            weightDifference: template.weightDifference,
+            caloriesToBurn: template.caloriesToBurn,
+            name: name
+        )
+
+        modelContext.insert(newData)
+
+        do {
+            try modelContext.save()
+            print("✅ Inserted new data for \(name) at \(now)")
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                latestProgress = newData
+                goToTracker = true
+            }
+
+        } catch {
+            print("❌ Gagal simpan data baru: \(error)")
+            isCreating = false
         }
     }
 
@@ -155,12 +201,10 @@ struct ParentView: View {
     private func dateToString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "id_ID")
-        formatter.dateFormat = "EEEE, dd MMMM yyyy HH:mm" // BONUS: Include time
+        formatter.dateFormat = "EEEE, dd MMMM yyyy HH:mm"
         return formatter.string(from: date)
     }
 }
-
-
 
 #Preview {
     ParentView(name: "Daniel")
