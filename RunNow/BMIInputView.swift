@@ -1,11 +1,5 @@
-//
-//  BMIInputView.swift
-//  RunForBetter
-//
-//  Created by Foundation-010 on 17/06/25.
-//
-
 import SwiftUI
+import SwiftData
 
 struct BMIInputView: View {
     let name: String
@@ -20,7 +14,9 @@ struct BMIInputView: View {
     @State private var calories: Int = 0
     @State private var goToRunning: Bool = false
     @State private var weightAsDouble: Double = 0
+    @State private var dailyData: DailyDataModel? // Store the created DailyDataModel
     
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -45,7 +41,7 @@ struct BMIInputView: View {
                         calories: calories,
                         goToRunning: $goToRunning,
                         showPopup: $showPopup,
-                        weightAsDouble: weightAsDouble
+                        dailyData: dailyData // Pass DailyDataModel
                     )
                 }
             }
@@ -268,7 +264,7 @@ struct BMIInputView: View {
         let calories: Int
         @Binding var goToRunning: Bool
         @Binding var showPopup: Bool
-        let weightAsDouble: Double
+        let dailyData: DailyDataModel?
         
         var body: some View {
             Color.black.opacity(0.4)
@@ -295,7 +291,7 @@ struct BMIInputView: View {
             .frame(maxWidth: 350, maxHeight: .infinity, alignment: .center)
             .transition(.scale)
             .overlay {
-                NavigationLink("", destination: RunningBurnTrackerView(userWeightKg: weightAsDouble), isActive: $goToRunning)
+                NavigationLink("", destination: RunningBurnTrackerView(dailyData: dailyData), isActive: $goToRunning)
                     .opacity(0)
             }
         }
@@ -337,6 +333,26 @@ struct BMIInputView: View {
         weightDiff = idealSubtraction(weight: w, heightCm: h)
         calories = weightDiff > 0 ? caloriesConvertWeight(from: weightDiff) : 0
         weightAsDouble = w
+        
+        // Create and save DailyDataModel
+        dailyData = DailyDataModel(
+            date: Date(),
+            bmi: result,
+            category: category,
+            weightDifference: weightDiff,
+            caloriesToBurn: calories,
+            name: name
+        )
+        if let dailyData = dailyData {
+            modelContext.insert(dailyData)
+            do {
+                try modelContext.save()
+                print("DailyDataModel saved successfully: \(dailyData)")
+            } catch {
+                print("Failed to save DailyDataModel: \(error.localizedDescription)")
+            }
+        }
+        
         showPopup = true
         showBMICategories = false
     }
@@ -344,4 +360,5 @@ struct BMIInputView: View {
 
 #Preview {
     BMIInputView(name: "user")
+        .modelContainer(for: [DailyDataModel.self, RunDataModel.self])
 }

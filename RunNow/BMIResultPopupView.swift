@@ -23,6 +23,7 @@ struct BMIResultPopup: View {
             Text("Hi, \(name)!")
                 .font(.body)
                 .fontWeight(.bold)
+            
             Text("Your BMI is \(String(format: "%.2f", bmi)). Your body category is \(category). \(weightDifferenceText())")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
@@ -31,58 +32,51 @@ struct BMIResultPopup: View {
                 Text("To reach your ideal weight, you need to burn approximately \(caloriesToBurn) calories.")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
-                    .font(.largeTitle)
-                
-                Divider()
-                    .padding(.vertical, 8)
-                
-                HStack(spacing: 16) {
-                    Button("Back") {
-                        onClose()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .tint(.shadedWhite)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.shadedWhite)
-                    )
-                    
-                    Button("OK") {
-                        saveData()
-                        onClose()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .tint(.shadedWhite)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.shadedWhite)
-                    )
-                    
-                    Button("Let's Start Running") {
-                        goToRunning = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.shadedOrange)
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.shadedOrange)
-                    )
-                }
-                .foregroundStyle(.darkHue)
-                .padding(.horizontal, 20)
+            } else {
+                Text("You're at your ideal weight, no calories to burn!")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
             }
+            
+            Divider()
+                .padding(.vertical, 8)
+            
+            HStack(spacing: 16) {
+                Button("Back") {
+                    // Discard data and allow recalculation
+                    onClose()
+                }
+                .buttonStyle(.borderedProminent)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .tint(.shadedWhite)
+                .foregroundStyle(.white)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.shadedWhite)
+                )
+                
+                Spacer()
+                
+                Button("OK") {
+                    // Save data and close popup
+                    saveData()
+                    onClose()
+                }
+                .buttonStyle(.borderedProminent)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .tint(.shadedWhite)
+                .foregroundStyle(.white)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(.shadedWhite)
+                )
+            }
+            .foregroundStyle(.darkHue)
+            .padding(.horizontal, 20)
         }
         .padding(.vertical, 24)
         .background(
@@ -116,6 +110,33 @@ struct BMIResultPopup: View {
             name: name
         )
         modelContext.insert(dailyData)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            print("Data saved successfully to SwiftData.")
+        } catch {
+            print("Failed to save data: \(error.localizedDescription)")
+        }
     }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: DailyDataModel.self, RunDataModel.self, configurations: config)
+    
+    @State var goToRunning = false
+    
+    return BMIResultPopup(
+        name: "Jane",
+        bmi: 27.0,
+        category: "Overweight",
+        onClose: {
+            print("Preview: onClose triggered")
+        },
+        goToRunning: $goToRunning,
+        weightDifference: 5.0,
+        caloriesToBurn: 38500 // Non-zero to show buttons
+    )
+    .modelContainer(container)
+    .padding()
+    .background(Color.gray.opacity(0.1))
 }
