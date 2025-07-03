@@ -190,8 +190,10 @@ struct RunningBurnTrackerView: View {
             dailyData: dailyData
         )
         
-        dailyData.runData = runData
-        modelContext.insert(runData)
+        if dailyData.runData == nil {
+            dailyData.runData = runData
+            modelContext.insert(runData)
+        }
 
         do {
             try modelContext.save()
