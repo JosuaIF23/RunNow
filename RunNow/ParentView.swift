@@ -12,6 +12,9 @@ struct ParentView: View {
     @State private var goToTracker = false
     @State private var latestProgress: DailyDataModel?
     @State private var isCreating = false
+    @State private var showDelayAlert = false
+    @State private var remainingSeconds: Int? = nil
+
 
     var body: some View {
         NavigationStack {
@@ -92,6 +95,18 @@ struct ParentView: View {
                     }
                     .disabled(isCreating)
 
+                    
+                    .alert("Tunggu 5 Menit", isPresented: $showDelayAlert) {
+                        Button("OK", role: .cancel) { }
+                    } message: {
+                        if let remaining = remainingSeconds {
+                            Text("Mohon tunggu \(remaining) detik lagi sebelum memulai progres baru.")
+                        } else {
+                            Text("Mohon tunggu hingga 5 menit sebelum memulai progres baru agar data bisa diproses dengan benar.")
+                        }
+
+                    }
+
                     NavigationLink(
                         destination: latestProgress.map {
                             RunningBurnTrackerView(dailyData: $0)
@@ -113,8 +128,11 @@ struct ParentView: View {
             .padding(.top)
         }
         .onAppear {
-            filterData()
+            DispatchQueue.main.async {
+                filterData()
+            }
         }
+
         .onChange(of: allData) { _ in
             filterData()
         }
@@ -139,12 +157,20 @@ struct ParentView: View {
 
         let now = Date()
 
-        // Cegah spam dalam 10 detik terakhir
-        if let last = filteredData.first, now.timeIntervalSince(last.date) < 10 {
-            print("⛔️ Sudah ada data dalam 10 detik terakhir")
-            isCreating = false
-            return
+//         Cegah spam dalam 10 detik terakhir
+        if let last = filteredData.first {
+            let timeGap = now.timeIntervalSince(last.date)
+            if timeGap < 300 {
+                let sisa = Int(300 - timeGap)
+                print("⛔️ Belum 5 menit dari data terakhir, sisa \(sisa) detik")
+                remainingSeconds = sisa
+                isCreating = false
+                showDelayAlert = true
+                return
+            }
         }
+
+
 
         guard let template = filteredData.last else {
             print("⚠️ Tidak ada template valid untuk user \(name)")
