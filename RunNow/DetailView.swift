@@ -9,9 +9,13 @@ import SwiftUI
 
 struct DetailView: View {
     let dailyData: DailyDataModel
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
+     
         VStack(spacing: 16) {
+            
+            Spacer()
             Text("Detail for \(dailyData.name)")
                 .font(.title)
                 .bold()
@@ -46,6 +50,18 @@ struct DetailView: View {
             Text("Date: \(DateFormatter.localizedString(from: dailyData.date, dateStyle: .medium, timeStyle: .short))")
                 .font(.subheadline)
             
+            Spacer()
+            
+            NavigationLink(destination: ParentView(name: dailyData.name)) {
+                Text("OK")
+                    .font(.headline)
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 30)
+
+
+            .buttonStyle(.borderedProminent)
+            .padding(.top, 30)
             Spacer()
         }
         .padding()

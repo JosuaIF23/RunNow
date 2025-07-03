@@ -60,10 +60,11 @@ struct BMIResultPopup: View {
                 Spacer()
                 
                 Button("OK") {
-                    // Save data and close popup
                     saveData()
+                    goToRunning = true // ⬅️ ini penting!
                     onClose()
                 }
+
                 .buttonStyle(.borderedProminent)
                 .font(.headline)
                 .fontWeight(.semibold)

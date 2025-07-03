@@ -14,6 +14,8 @@ struct RunningBurnTrackerView: View {
     @StateObject var timer = StopWatchTimer()
     @State private var isRunning = false
     let dailyData: DailyDataModel?
+    @State private var goToDetail = false
+    @State private var newDailyData: DailyDataModel?
     
     @State private var finalCaloriesBurned: Double?
     @State private var runFinished = false
@@ -51,8 +53,17 @@ struct RunningBurnTrackerView: View {
                     timer.stopWatch()
                     runFinished = true
                     finalCaloriesBurned = motion.estimateCaloriesBurned(weightKG: currentWeight, minutes: timer.minutes)
+
                     saveRunData()
+
+                    // Tambahkan sedikit delay agar data tersimpan dulu
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        goToDetail = true
+                    }
                 }
+
+
+                
                 .padding()
                 .frame(width: 100)
                 .background(Color.red)
@@ -137,9 +148,22 @@ struct RunningBurnTrackerView: View {
             }
             
             Spacer()
+            
+            if let data = newDailyData {
+                NavigationLink(
+                    destination: DetailView(dailyData: data),
+                    isActive: $goToDetail
+                ) {
+                    EmptyView()
+                }
+                .opacity(0)
+            }
+
         }
         .padding()
     }
+    
+    
     
     private var currentWeight: Double {
         guard let weightDiff = dailyData?.weightDifference else { return 60.0 } // Default to 60 kg if no data
@@ -150,16 +174,13 @@ struct RunningBurnTrackerView: View {
     private func saveRunData() {
         guard let dailyData = dailyData, let caloriesBurned = finalCaloriesBurned else { return }
         
-        // Update caloriesToBurn
         if let currentCalories = dailyData.caloriesToBurn {
             dailyData.caloriesToBurn = max(0, currentCalories - Int(caloriesBurned))
         }
         
-        // Calculate weight loss (7700 calories = 1 kg)
         let weightLoss = caloriesBurned / 7700.0
         let newWeight = currentWeight - weightLoss
         
-        // Create new RunDataModel
         let runData = RunDataModel(
             distance: motion.distance,
             duration: timer.minutes,
@@ -169,18 +190,17 @@ struct RunningBurnTrackerView: View {
             dailyData: dailyData
         )
         
-        // Update DailyDataModel
         dailyData.runData = runData
-        
-        // Save to SwiftData
         modelContext.insert(runData)
+
         do {
             try modelContext.save()
-            print("Run data saved successfully: \(runData)")
+            newDailyData = dailyData
         } catch {
             print("Failed to save run data: \(error.localizedDescription)")
         }
     }
+
 }
 
 #Preview {

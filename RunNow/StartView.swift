@@ -13,6 +13,8 @@ struct StartView: View {
     @State private var showNameEnter = false
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \DailyDataModel.date, order: .reverse, animation: .default) private var dailyData: [DailyDataModel]
+    @State private var goToParent = false
+
     
     private let isFirstLaunchKey = "isFirstLaunch"
     
@@ -52,23 +54,19 @@ struct StartView: View {
                     if dailyData.isEmpty || !hasCompleteData() {
                         showNameEnter = true
                     } else {
-                        isActive = true
+                        goToParent = true
                     }
                 }
+
                 .fullScreenCover(isPresented: $showNameEnter) {
                     NameEnterView()
                 }
-                .fullScreenCover(isPresented: $isActive) {
-                    if dailyData.isEmpty || !hasCompleteData() {
-                        NameEnterView()
-                    } else {
-                        if let firstData = dailyData.first, !firstData.name.isEmpty {
-                            ParentView(name: firstData.name)
-                        } else {
-                            NameEnterView()
-                        }
+                .navigationDestination(isPresented: $goToParent) {
+                    if let firstData = dailyData.first {
+                        ParentView(name: firstData.name)
                     }
                 }
+
             }
             .navigationBarHidden(true)
         }
@@ -76,8 +74,9 @@ struct StartView: View {
     
     private func hasCompleteData() -> Bool {
         guard let firstData = dailyData.first else { return false }
-        return !firstData.name.isEmpty && firstData.bmi != nil
+        return !firstData.name.isEmpty && firstData.bmi != nil && firstData.runData != nil
     }
+
     
     private var isFirstLaunch: Bool {
         let defaults = UserDefaults.standard
