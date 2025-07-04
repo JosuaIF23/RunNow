@@ -12,7 +12,6 @@ struct DetailHarianView: View {
                     .bold()
                     .padding(.top, 24)
 
-                // Section: General Info
                 sectionCard {
                     VStack(alignment: .leading, spacing: 12) {
                         if let bmi = dailyData.bmi {
@@ -34,7 +33,6 @@ struct DetailHarianView: View {
                     }
                 }
 
-                // Section: Run Data
                 if let runData = dailyData.runData {
                     sectionCard {
                         VStack(alignment: .leading, spacing: 12) {
@@ -50,12 +48,10 @@ struct DetailHarianView: View {
                     }
                 }
 
-                // Date
                 Text("📅 Date: \(dateToString(dailyData.date))")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
-                // Back Button
                 Button(action: {
                     dismiss()
                 }) {
@@ -100,13 +96,13 @@ struct DetailHarianView: View {
     // MARK: - Logic
 
     private func calculateCurrentWeight(weightDifference: Double) -> Double {
-        let idealWeight = 22.0 * (1.7 * 1.7) // Example: height 1.7m, ideal BMI 22
+        let idealWeight = 22.0 * (1.7 * 1.7)
         return idealWeight + weightDifference
     }
 
     private func dateToString(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US") // Changed to English
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "EEEE, dd MMMM yyyy HH:mm"
         return formatter.string(from: date)
     }
