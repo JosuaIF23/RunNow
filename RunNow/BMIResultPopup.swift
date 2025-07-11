@@ -63,29 +63,29 @@ struct BMIResultPopup: View {
                             .fill(.shadedOrange)
                     )
                 }
-            }
                 .foregroundStyle(.darkHue)
                 .padding(.horizontal, 20)
-                .padding(.vertical, 24)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 1)
-                )
-                .padding(.horizontal, 16)
-        }
-        
-        func weightDifferenceText() -> String {
-            switch category {
-            case "Underweight":
-                return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
-            case "Normal Ideal weight":
-                return "You're at your ideal weight."
-            case "Overweight", "Obese":
-                return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
-            default:
-                return ""
             }
+        }
+        .padding(.vertical, 24)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 1)
+        )
+        .padding(.horizontal, 16)
+    }
+    
+    func weightDifferenceText() -> String {
+        switch category {
+        case "Underweight":
+            return String(format: "You're %.1f kg below your ideal body weight.", abs(weightDifference))
+        case "Normal Ideal weight":
+            return "You're at your ideal weight."
+        case "Overweight", "Obese":
+            return String(format: "You're %.1f kg above your ideal body weight.", weightDifference)
+        default:
+            return ""
         }
     }
 }

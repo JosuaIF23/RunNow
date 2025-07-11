@@ -47,8 +47,8 @@ struct NameEnter: View {
                 .frame(width:300, height:50)
                 .background(.white)
                 .cornerRadius(10)
-                NavigationLink(destination: BMIInputView(name: name), isActive: $goToNext) {
-                    EmptyView()
+                .navigationDestination(isPresented: $goToNext) {
+                    BMIInputView(name: name)
                 }
                 //button textfields
                 Button(action: {
